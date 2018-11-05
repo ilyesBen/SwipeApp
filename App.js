@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Deck from './src/Deck';
 import { Card, Button } from 'react-native-elements';
+import Deck from './src/Deck';
 
 const DATA = [
   { id: 1, text: 'Card #1', uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg' },
@@ -34,12 +34,27 @@ class App extends React.Component {
     );
   }
 
+  renderNoMoreCards() {
+    return (
+      <Card title="All done">
+        <Text style={{ marginBottom: 10 }}>
+          ther is not more card to be rendered
+        </Text>
+        <Button
+          backgroundColor="#03A9F4"
+          title="Get More"
+        />
+      </Card>
+    );
+  }
+
   render() {
     return (
       <View style={styles.container} >
         <Deck
           data={DATA}
           renderCard={this.renderCard}
+          renderNoMoreCards={this.renderNoMoreCards}
         />
       </View>
     );
