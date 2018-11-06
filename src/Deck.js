@@ -3,7 +3,9 @@ import {
   Animated,
   View,
   PanResponder,
-  Dimensions
+  Dimensions,
+  LayoutAnimation,
+  UIManager
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -38,6 +40,17 @@ class Deck extends Component {
     });
 
     this.state = { index: 0 };
+  }
+
+  componentWillReceiveProps(nextProps) {
+      if (nextProps.data !== this.props.data) {
+        this.setState({ index: 0 });
+      }
+  }
+
+  componentWillUpdate() {
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutManagerAnimationEnabledExperimental(true); // eslint-disable-line
+    LayoutAnimation.spring();
   }
 
   onSwipeComplete(direction) {
@@ -88,17 +101,27 @@ class Deck extends Component {
       if (i === index) {
         return (
           <Animated.View
-            style={this.getCardStyle()}
-            {...this.panResponder.panHandlers}
             key={item.id}
+            style={[this.getCardStyle(), styles.card]}
+            {...this.panResponder.panHandlers}
           >
             {this.props.renderCard(item)}
           </Animated.View>
         );
       }
 
-      return this.props.renderCard(item);
-    });
+      return (
+        //Animated.View used here just to avoid moving from View
+        // to Animated.View which causes the cards to flash
+        // it does not animate at this point
+        <Animated.View
+          key={item.id}
+          style={[styles.card, { top: 10 * (i - index) }]}
+        >
+          {this.props.renderCard(item)}
+        </Animated.View>
+      );
+    }).reverse();
   }
 
   render() {
@@ -109,5 +132,12 @@ class Deck extends Component {
     );
   }
 }
+
+const styles = {
+  card: {
+    position: 'absolute',
+    width: SCREEN_WIDTH
+  }
+};
 
 export default Deck;
